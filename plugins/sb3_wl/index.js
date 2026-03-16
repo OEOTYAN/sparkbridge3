@@ -1,4 +1,5 @@
 const fileObj = spark.getFileHelper('sb3_wl');
+const logger = spark.getLogger();
 
 
 const initconf = {

@@ -2,6 +2,8 @@
 const winston = require('winston');
 const { format } = winston;
 require('winston-daily-rotate-file');
+const Transport = require('winston-transport'); // [新增]
+const EventEmitter = require('events');         // [新增]
 // 默认根配置，实际项目中可在 SparkCore 启动时覆盖此值
 let rootHeader = 'SparkBridge3';
 
@@ -49,6 +51,39 @@ const customFormat = format.printf(({ level, message, label, timestamp }) => {
 //     });
 // };
 
+// ==========================================
+//  内存日志缓存与事件发射器
+// ==========================================
+const logEmitter = new EventEmitter();
+const logCache = [];
+const MAX_LOGS = 100; // 在内存中保留最近的 500 条日志，防止撑爆内存
+
+class MemoryTransport extends Transport {
+    log(info, callback) {
+        // 因为开启了 colorize，level 和 message 可能会带有 \x1B[32m 这种控制台颜色代码
+        // 这里提供一个正则函数，将发送给前端的数据洗白，只保留纯文本
+        const stripAnsi = (str) => typeof str === 'string' ? str.replace(/\x1B\[\d+m/g, '') : str;
+
+        const logEntry = {
+            time: info.timestamp,
+            level: stripAnsi(info.level),
+            plugin: info.label || 'Default',
+            msg: stripAnsi(info.message)
+        };
+
+        // 存入缓存
+        logCache.push(logEntry);
+        if (logCache.length > MAX_LOGS) {
+            logCache.shift(); // 超过上限则剔除最旧的日志
+        }
+
+        // 触发实时事件，方便日后做 WebSocket 或 SSE 推送
+        logEmitter.emit('new-log', logEntry);
+
+        callback();
+    }
+}
+
 const getLogger = (labelName = 'Default') => {
     return winston.createLogger({
         level: 'info',
@@ -72,9 +107,10 @@ const getLogger = (labelName = 'Default') => {
                     format.uncolorize(),         // 文件日志通常去除颜色字符
                     customFormat
                 )
-            })
+            }),
+            new MemoryTransport()
         ]
     });
 };
 
-module.exports = { getLogger, setRootHeader };
+module.exports = { getLogger, setRootHeader, logCache, logEmitter };

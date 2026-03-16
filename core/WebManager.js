@@ -9,7 +9,8 @@ const authRoutes = require('./routes/auth');
 const pluginRoutes = require('./routes/plugin');
 const overviewRoutes = require('./routes/overview');
 const installRoutes = require('./routes/upload');
-const toggleRoutes = require('./routes/toggle');    
+const toggleRoutes = require('./routes/toggle');   
+const logsRoutes = require('./routes/logs');
 
 class WebManager {
     constructor(core) {
@@ -74,7 +75,8 @@ class WebManager {
         this.requireAuth = (req, res, next) => {
             const jwt = require('jsonwebtoken');
             const authHeader = req.headers['authorization'];
-            const token = authHeader && authHeader.split(' ')[1];
+            const token = (authHeader && authHeader.split(' ')[1]) || req.query.token;
+            // const token = authHeader && authHeader.split(' ')[1];
 
             if (!token) return res.status(401).json({ code: 401, msg: '未登录' });
 
@@ -93,6 +95,7 @@ class WebManager {
         this.app.use('/api/overview', overviewRoutes(this));
         this.app.use('/api/plugins', installRoutes(this));
         this.app.use('/api/plugins', toggleRoutes(this));
+        this.app.use('/api/logs', logsRoutes(this));
     }
     generateRandomString(length) {
         var result = '';
@@ -112,9 +115,9 @@ class WebManager {
         }
         // 2. 解决Vue History路由模式的404问题（关键）
         // 所有未匹配到接口的请求，都返回Vue的index.html
-        // this.app.get(/^\/.*/, (req, res) => {
-        //     res.sendFile(path.join(__dirname, 'web', 'index.html'));
-        // });
+        this.app.get(/^\/.*/, (req, res) => {
+            res.sendFile(path.join(__dirname,'../', 'web', 'index.html'));
+        });
         this.app.listen(this.port, this.host, () => {
             logger.info(`Web 控制面板已启动: http://${this.host === '0.0.0.0' ? '127.0.0.1' : this.host}:${this.port}`);
         });

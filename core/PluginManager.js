@@ -231,6 +231,23 @@ class PluginManager {
             return;
         }
 
+        // ==========================================
+        //  3. 检查最低框架版本要求
+        // ==========================================
+        // 支持开发者在 spark.json 中填写 "min_version": "3.0.1 build 2"
+        let minVersion = info.min_v;
+        if (minVersion) {
+            // 获取当前框架的真实版本 (来自 package.json)
+            const currentVersion = this.core.sharedEnv['version'] || '3.0.0';
+
+            if (!this.checkVersion(currentVersion, minVersion)) {
+                logger.warn(`[拦截] 插件 ${name} 需要 SparkBridge3 最低版本为 v${minVersion}，当前框架版本为 v${currentVersion}，已跳过加载`);
+                pData.status = 'ignored';
+                pData.error = `框架版本过低 (需求: ${minVersion})`; // 记录错误信息，方便 Web 端展示
+                return;
+            }
+        }
+
         // 3. 执行沙盒加载并拦截崩溃
         try {
             if (info.permission === 'core') {
@@ -314,6 +331,44 @@ class PluginManager {
             };
         }
         return context;
+    }
+
+    /**
+     * 检查当前框架版本是否满足插件的最低版本要求
+     * 支持纯数字 x.x.x 格式，以及 x.x.x build y 格式
+     * @param {string} current 当前框架版本
+     * @param {string} required 插件要求的最低版本
+     * @returns {boolean} true 表示满足要求，false 表示版本过低
+     */
+    checkVersion(current, required) {
+        if (!required) return true; // 插件没有版本要求，默认放行
+        if (!current) return false; // 异常情况兜底
+
+        // 解析版本字符串的内部工具函数
+        const parseVer = (v) => {
+            // 统一转小写并按照 " build " 拆分 (注意 build 前后有空格)
+            const [base, buildStr] = String(v).toLowerCase().split(' build ');
+            // 将 x.x.x 拆分为整数数组
+            const parts = base.split('.').map(n => parseInt(n) || 0);
+            // 提取 build 号，如果没有则默认为 0
+            const build = buildStr ? parseInt(buildStr) || 0 : 0;
+            return { parts, build };
+        };
+
+        const v1 = parseVer(current);
+        const v2 = parseVer(required);
+
+        // 1. 先比较主/次/修订版本号 (补齐长度对比，兼容 3.0 和 3.0.0 的对比)
+        const len = Math.max(v1.parts.length, v2.parts.length);
+        for (let i = 0; i < len; i++) {
+            const num1 = v1.parts[i] || 0;
+            const num2 = v2.parts[i] || 0;
+            if (num1 > num2) return true;  // 当前版本更高
+            if (num1 < num2) return false; // 当前版本太低
+        }
+
+        // 2. 如果基础版本号完全一致，则比较 build 号
+        return v1.build >= v2.build;
     }
 }
 
