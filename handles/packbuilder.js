@@ -45,6 +45,27 @@ class Builder {
             }
         }
     }
+    // 群内戳一戳
+    static GroupPokePack(group_id, user_id, id) {
+        return {
+            action: 'group_poke',
+            echo: id,
+            params: {
+                group_id: group_id,
+                user_id: user_id
+            }
+        }
+    }
+    // 私聊戳一戳
+    static FriendPokePack(user_id, id) {
+        return {
+            action: 'send_friend_poke',
+            echo: id,
+            params: {
+                user_id: user_id
+            }
+        }
+    }
 
     static DeleteMsgPack(id) {
         return {
