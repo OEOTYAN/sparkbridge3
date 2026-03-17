@@ -451,6 +451,19 @@ class OneBotWSAdapter extends BaseAdapter {
             }, 10e3);
         }).catch(this.defaultErrorHandler)
     }
+    setGroupCard(gid, mid, card){
+        let tmp_id = uuid();
+        this.sendWSPack(packbuilder.GroupCardSet(gid, mid, card));
+        return new Promise((res, rej) => {
+            this.once('packid_' + tmp_id, (data) => {
+                res(data);
+            });
+            setTimeout(() => {
+                rej({ reason: 'timeout' });
+            }, 10e3);
+        }).catch(this.defaultErrorHandler)
+
+    }
 }
 
 module.exports = OneBotWSAdapter;

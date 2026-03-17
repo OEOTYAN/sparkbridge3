@@ -234,7 +234,7 @@ class PluginManager {
         // ==========================================
         //  3. 检查最低框架版本要求
         // ==========================================
-        // 支持开发者在 spark.json 中填写 "min_version": "3.0.1 build 2"
+        // 支持开发者在 spark.json 中填写 "min_v": "3.0.1 build 2"
         let minVersion = info.min_v;
         if (minVersion) {
             // 获取当前框架的真实版本 (来自 package.json)
@@ -301,7 +301,6 @@ class PluginManager {
         const pluginName = name || folder;
         const legacySpark = this.core.getLegacyAPI(pluginName, folder);
         const pluginLogger = getLogger(pluginName);
-
         const pluginDir = path.dirname(filePath);
         
 

@@ -142,6 +142,9 @@ class BaseAdapter extends EventEmitter {
     getModelShow(){
         throw new Error('Method getModelShow must be implemented');
     }
+    setGroupCard(groupId, userId, card){
+        throw new Error('Method setGroupCard must be implemented');
+    }
 }
 
 module.exports = BaseAdapter;

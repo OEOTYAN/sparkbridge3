@@ -187,7 +187,7 @@ declare interface QClient {
     getFriendList(): Promise<any>
     getGroupList(): Promise<any>
     getGroupHonorInfo(groupId: number, type: string): Promise<any>
-
+    setGroupCard(groupId: number, userId: number, card: string): Promise<void>
 }
 
 // --- 注入沙盒的全局变量 ---
