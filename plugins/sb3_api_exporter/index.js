@@ -72,7 +72,7 @@ spark.on('core.ready', () => {
         ll.exports((qq) => spark.msgbuilder.at(qq), name_space, "at");
         ll.exports((file) => spark.msgbuilder.img(file), name_space, "img");
         ll.exports((id) => spark.msgbuilder.face(id), name_space, "face");
-        ll.exports((id) => spark.msgbuilder.poke(id), name_space, "poke");
+        // ll.exports((id) => spark.msgbuilder.poke(id), name_space, "poke");
         ll.exports((file) => spark.msgbuilder.video(file), name_space, "video");
         ll.exports((file) => spark.msgbuilder.record(file), name_space, "record");
         ll.exports((id) => spark.msgbuilder.reply(id), name_space, "reply");
@@ -80,6 +80,8 @@ spark.on('core.ready', () => {
         ll.exports(() => spark.msgbuilder.ForwardMsgBuilder(), name_space, "ForwardMsgBuilder");
         
         // ==================== 包构建器 ====================
+        ll.exports((group_id, user_id, id) => spark.packbuilder.GroupPokePack(group_id, user_id, id), name_space, "GroupPokePack");
+        ll.exports((user_id, id) => spark.packbuilder.FriendPokePack(user_id, id), name_space, "FriendPokePack");
         ll.exports((gid, msg, id) => spark.packbuilder.GroupMessagePack(gid, msg, id), name_space, "GroupMessagePack");
         ll.exports((fid, msg, id) => spark.packbuilder.PrivateMessagePack(fid, msg, id), name_space, "PrivateMessagePack");
         ll.exports((gid, msg, id) => spark.packbuilder.GroupForwardMessagePack(gid, msg, id), name_space, "GroupForwardMessagePack");

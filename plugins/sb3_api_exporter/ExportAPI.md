@@ -235,13 +235,6 @@
 - 返回值：表情消息段
 - 返回值类型：Object
 
-### 戳一戳
-`poke(id)`
-- 参数：
-  - id : `String | Number` - 要戳的 QQ 号
-- 返回值：戳一戳消息段
-- 返回值类型：Object
-
 ### 视频消息
 `video(file)`
 - 参数：
@@ -276,6 +269,23 @@
 - 返回值类型：Object
 
 ## 包构建器（高级功能）
+
+### 群截一截包
+`GroupPokePack(group_id, user_id, id)`
+- 参数：
+  - group_id : `Number` - 群号
+  - user_id : `Number` - 被戳用户 QQ
+  - id : `String` - 唯一请求 ID
+- 返回值：OneBot 协议数据包
+- 返回值类型：Object
+
+### 私聊截一截保
+`FriendPokePack(user_id, id)`
+- 参数：
+  - user_id : `Number` - 被戳用户 QQ
+  - id : `String` - 唯一请求 ID
+- 返回值：OneBot 协议数据包
+- 返回值类型：Object
 
 ### 群消息包
 `GroupMessagePack(gid, msg, id)`

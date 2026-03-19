@@ -154,3 +154,30 @@ core.start().then(() => {
 
     logger.info(`✨ SparkBridge3 启动完毕！当前核心版本: ${ME.version} ✨`);
 }).catch(e =>{console.log(e); logger.error("框架启动失败: ", e)});
+
+// ==========================================
+// 7. 添加卸载ws （解决重载时连接问题）
+// ==========================================
+if (typeof ll !== 'undefined' && ll.onUnload) {
+    ll.onUnload(() => {
+        logger.info('SparkBridge3 正在卸载，清理 WebSocket 连接...');
+        
+        // 断开所有客户端连接（强制它们重连）
+        if (defaultAdapter && defaultAdapter.disconnectAllClients) {
+            defaultAdapter.disconnectAllClients();
+        }
+        
+        // 关闭服务端
+        if (defaultAdapter && defaultAdapter.client) {
+            try {
+                defaultAdapter.client.removeAllListeners();
+                defaultAdapter.client.close();
+                logger.info('✓ WebSocket 服务端已关闭');
+            } catch (e) {
+                logger.error(`✗ 关闭服务端时出错: ${e}`);
+            }
+        }
+        
+        logger.info('SparkBridge3 卸载完成，客户端将在重载后重新连接...');
+    });
+}

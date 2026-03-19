@@ -89,11 +89,16 @@ class OneBotWSAdapter extends BaseAdapter {
 
     // 内部方法：初始化反向 WebSocket (作为服务端等待机器人连接)
     _initReverseWS() {
-        this.client = new WebSocket.Server({ port: this.port });
+        this.client = new WebSocket.Server({
+            port: this.port,
+            reuseAddr: true
+        });
         this.logger.info(`反向 WebSocket 服务器于 ws://localhost:${this.port} 开启`);
 
+        this.connectedClients = new Set();
         this.client.on('connection', (ws, req) => {
             this.logger.info(`收到来自 ${req.headers.host} 的连接请求`);
+            this.connectedClients.add(ws);
 
             if (global.spark && global.spark.debug) {
                 console.log('Client request headers:', req.headers);
@@ -121,6 +126,7 @@ class OneBotWSAdapter extends BaseAdapter {
             });
 
             ws.on('close', () => {
+                this.connectedClients.delete(ws);
                 this.logger.info('WebSocket 客户端已断开连接');
             });
         });
@@ -463,6 +469,20 @@ class OneBotWSAdapter extends BaseAdapter {
             }, 10e3);
         }).catch(this.defaultErrorHandler)
 
+    }
+    // 断开所有客户端
+    disconnectAllClients() {
+        this.logger.info('正在断开所有客户端连接...');
+        if (this.connectedClients) {
+            this.connectedClients.forEach(client => {
+                try {
+                    client.close(1000, '服务器重启');
+                } catch (e) {
+                    this.logger.error(`断开客户端失败: ${e}`);
+                }
+            });
+            this.connectedClients.clear();
+        }
     }
 }
 
