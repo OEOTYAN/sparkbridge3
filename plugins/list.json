@@ -5,5 +5,6 @@
   "sb3_mc",
   "sb3_wl",
   "sb3_deps",
-  "sb3_api_exporter"
+  "sb3_api_exporter",
+  "AIchat"
 ]
