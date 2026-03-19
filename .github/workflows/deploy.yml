@@ -40,6 +40,9 @@ jobs:
           cp -r ./external-vue-app/dist/* ./web/
           rm -rf ./external-vue-app
 
+      - name: Generate Update Manifest
+        run: node scripts/generate_manifest.js
+
       # 5. 执行你指定的 7z 打包命令
       # 严格按照你提供的列表进行打包
       - name: Package Project with 7z
@@ -65,6 +68,8 @@ jobs:
           body: |
             自动构建发布
             Tag: ${{ github.ref_name }}
-          files: sparkbridge3.zip
+          files: |
+            sparkbridge3.zip
+            update-manifest.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
