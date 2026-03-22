@@ -22,6 +22,7 @@ class SparkCore extends EventEmitter {
         // 【修复点】传入 this 作为 core 实例，传入端口作为第二个参数
         this.webManager = new WebManager(this, config.server_port);
         this.pluginManager = new PluginManager(this);
+        this.setMaxListeners(0)
     }
 
     useAdapter(adapter) {

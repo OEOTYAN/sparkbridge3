@@ -9,14 +9,13 @@ const targetDir = path.join(__dirname, '../');
 const ignoreList = [
     '.git',
     '.github',
-    'node_modules',
+    '.gitignore',
     'scripts',       // 打包脚本自己不需要发出去
     'temp',
     'logs',
     'testdata',
-    'plugins',
-    'base',          // 用户配置文件
-    'web/config.json' // 前端配置文件
+    'serverdata',
+    'SparkBridgeDevelopTool',
 ];
 
 function getFiles(dir, fileList = []) {
