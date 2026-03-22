@@ -113,11 +113,13 @@ class WebManager {
             this.mixpassword = this.generateRandomString(8);
             logger.info(`生成随机密码: ${this.mixpassword}`)
         }
-        // 2. 解决Vue History路由模式的404问题（关键）
-        // 所有未匹配到接口的请求，都返回Vue的index.html
-        this.app.get(/^\/.*/, (req, res) => {
-            res.sendFile(path.join(__dirname,'../', 'web', 'index.html'));
-        });
+        spark.on("core.ready",()=>{
+            // 2. 解决Vue History路由模式的404问题（关键）
+            // 所有未匹配到接口的请求，都返回Vue的index.html
+            this.app.get(/^\/.*/, (req, res) => {
+                res.sendFile(path.join(__dirname, '../', 'web', 'index.html'));
+            });
+        })
         this.app.listen(this.port, this.host, () => {
             logger.info(`Web 控制面板已启动: http://${this.host === '0.0.0.0' ? '127.0.0.1' : this.host}:${this.port}`);
         });
