@@ -9,6 +9,7 @@ sparkbridge3.zip
 /plugins/list.json
 publish.bat
 temp/
+/plugins/list.json
 # idea
 .vscode/
 
